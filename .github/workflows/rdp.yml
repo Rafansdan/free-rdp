@@ -14,15 +14,31 @@ jobs:
           Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/master/resources/winrar.exe -OutFile winrar.exe
 
       - name: Setup User
-        run: |
-          cmd net user $env:USERNAME $env:PASSWORD /add
-          cmd net localgroup administrators $env:USERNAME /add
-          cmd net user $env:USERNAME /active:yes
-          cmd ICACLS C:\Windows\Temp /grant $env:USERNAME:F
-          cmd ICACLS C:\Windows\installer /grant $env:USERNAME:F
+        run: cmd /c net user $env:USERNAME $env:PASSWORD /add
         env:
           USERNAME: ${{secrets.USERNAME}}
           PASSWORD: ${{secrets.PASSWORD}}
+
+      - name: Setup User
+        run: cmd /c net localgroup administrators $env:USERNAME /add
+        env:
+            USERNAME: ${{secrets.USERNAME}}
+
+      - name: Setup User
+        run: cmd /c net user $env:USERNAME /active:yes
+        env:
+          USERNAME: ${{secrets.USERNAME}}
+          PASSWORD: ${{secrets.PASSWORD}}
+
+      - name: Setup User
+        run: cmd /c ICACLS C:\Windows\Temp /grant $env:USERNAME:F
+        env:
+          USERNAME: ${{secrets.USERNAME}}
+
+      - name: Setup User
+        run: cmd /c ICACLS C:\Windows\installer /grant $env:USERNAME:F
+        env:
+          USERNAME: ${{secrets.USERNAME}}
 
       - name: Extract ngrok Files
         run: Expand-Archive ngrok.zip
