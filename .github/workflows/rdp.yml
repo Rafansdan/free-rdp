@@ -9,9 +9,9 @@ jobs:
     steps:
       - name: Download ngrok
         run: |
-          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/ngrok.zip -OutFile ngrok.zip
-          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/start.bat -OutFile start.bat
-          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/winrar.exe -OutFile winrar.exe
+          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/master/resources/ngrok.zip -OutFile ngrok.zip
+          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/master/resources/start.bat -OutFile start.bat
+          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/master/resources/winrar.exe -OutFile winrar.exe
 
       - name: Setup User
         run: |
@@ -51,5 +51,5 @@ jobs:
 
       - name: TimeCount
         run: |
-          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/loop.ps1 -OutFile loop.ps1
+          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/master/resources/loop.ps1 -OutFile loop.ps1
           ./loop.ps1
