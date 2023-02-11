@@ -31,12 +31,12 @@ jobs:
           PASSWORD: ${{secrets.PASSWORD}}
 
       - name: Setup User
-        run: cmd /c ICACLS --% "C:/Windows/Temp" /grant "$env:USERNAME":F
+        run: cmd /c ICACLS --% "C:/Windows/Temp" /grant $env:USERNAME:F
         env:
           USERNAME: ${{secrets.USERNAME}}
 
       - name: Setup User
-        run: cmd /c ICACLS --% "C:/Windows/installer" /grant "$env:USERNAME":F
+        run: cmd /c ICACLS --% "C:/Windows/installer" /grant $env:USERNAME:F
         env:
           USERNAME: ${{secrets.USERNAME}}
 
