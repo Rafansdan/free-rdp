@@ -15,15 +15,14 @@ jobs:
 
       - name: Setup User
         run: |
-          New-LocalUser -Name $env:USERNAME -Password $env:PASSWORD -FullName “$env:FULL_NAME"
-          Add-LocalGroupMember -Group Administrators -Member "$env:USERNAME”
-          Enable-LocalUser -Name $env:USERNAME
+          cmd net user $env:USERNAME $env:PASSWORD /add
+          cmd net localgroup administrators $env:USERNAME /add
+          cmd net user $env:USERNAME /active:yes
           cmd ICACLS C:\Windows\Temp /grant $env:USERNAME:F
           cmd ICACLS C:\Windows\installer /grant $env:USERNAME:F
         env:
           USERNAME: ${{secrets.USERNAME}}
           PASSWORD: ${{secrets.PASSWORD}}
-          FULL_NAME: ${{secrets.FULL_NAME}}
 
       - name: Extract ngrok Files
         run: Expand-Archive ngrok.zip
