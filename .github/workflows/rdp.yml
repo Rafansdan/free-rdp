@@ -3,43 +3,53 @@ on: workflow_dispatch
 
 jobs:
   build:
-
     runs-on: windows-latest
     timeout-minutes: 9999
 
     steps:
+      - name: Download ngrok
+        run: |
+          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/ngrok.zip -OutFile ngrok.zip
+          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/start.bat -OutFile start.bat
+          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/winrar.exe -OutFile winrar.exe
 
-    - name: Download ngrok
-      run: |
-        Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/ngrok.zip -OutFile ngrok.zip
-        Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/start.bat -OutFile start.bat
-        Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/winrar.exe -OutFile winrar.exe
+      - name: Setup User
+        run: |
+          New-LocalUser -Name $env:USERNAME -Password $env:PASSWORD -FullName “$env:FULL_NAME"
+          Add-LocalGroupMember -Group Administrators -Member "$env:USERNAME”
+          Enable-LocalUser -Name $env:USERNAME
+          cmd ICACLS C:\Windows\Temp /grant $env:USERNAME:F
+          cmd ICACLS C:\Windows\installer /grant $env:USERNAME:F
+        env:
+          USERNAME: ${{secrets.USERNAME}}
+          PASSWORD: ${{secrets.PASSWORD}}
+          FULL_NAME: ${{secrets.FULL_NAME}}
 
-    - name: Extract ngrok Files
-      run: Expand-Archive ngrok.zip
+      - name: Extract ngrok Files
+        run: Expand-Archive ngrok.zip
 
-    - name: Connecting ngrok Account
-      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
-      env:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+      - name: Connecting ngrok Account
+        run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
-    - name: Enable RDP Access
-      run: |
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
-        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
-        copy winrar.exe C:\Users\Public\Desktop\winrar.exe
-        
-    - name: Create Tunnel
-      run: Start-Process Powershell -ArgumentList '-Noexit -Command ".\ngrok\ngrok.exe tcp 3389"'
+      - name: Enable RDP Access
+        run: |
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+          copy winrar.exe C:\Users\Public\Desktop\winrar.exe
 
-    - name: Connect to RDP  [CPU 2 Core - 7GB Ram - 256 SSD]
-      run: cmd /c start.bat
+      - name: Create Tunnel
+        run: Start-Process Powershell -ArgumentList '-Noexit -Command ".\ngrok\ngrok.exe tcp 3389"'
 
-    - name: Install Winrar
-      run: cmd /c C:\Users\Public\Desktop\winrar.exe winrar.exe /s
-      
-    - name: TimeCount
-      run: |
-        Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/loop.ps1 -OutFile loop.ps1
-        ./loop.ps1
+      - name: Connect to RDP  [CPU 2 Core - 7GB Ram - 256 SSD]
+        run: cmd /c start.bat
+
+      - name: Install Winrar
+        run: cmd /c C:\Users\Public\Desktop\winrar.exe winrar.exe /s
+
+      - name: TimeCount
+        run: |
+          Invoke-WebRequest https://raw.githubusercontent.com/ardli-firman/free-rdp/main/resources/loop.ps1 -OutFile loop.ps1
+          ./loop.ps1
